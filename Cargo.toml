@@ -1,0 +1,65 @@
+
+[package]
+name = "solana_rust_api"
+version = "0.1.0"
+edition = "2021"
+default-run = "solana_rust_api"
+
+[dependencies]
+axum = "0.7"
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+rusqlite = { version = "0.31", features = ["bundled"] }
+
+# Solana dependencies
+solana-sdk = "1.18"
+solana-client = "1.18"
+solana-transaction-status = "1.18"
+spl-token = "4.0"
+spl-associated-token-account = "2.3"
+
+# Authentication
+jsonwebtoken = "9.2"
+pbkdf2 = "0.12"
+sha2 = "0.10"
+rand = "0.8"
+
+# Encryption
+aes-gcm = "0.10"
+hex = "0.4"
+
+# Environment variables
+dotenv = "0.15"
+
+# Rate limiting
+tower = "0.4"
+tower-http = { version = "0.5", features = ["limit"] }
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Async runtime
+futures = "0.3"
+
+# Time utilities
+chrono = { version = "0.4", features = ["serde"] }
+
+# UUID generation
+uuid = { version = "1.6", features = ["v4", "serde"] }
+
+# Base58 decoding (for key conversion)
+bs58 = "0.5"
+
+[[bin]]
+name = "solana_rust_api"
+path = "src/main.rs"
+
+[[bin]]
+name = "convert_key"
+path = "convert_key.rs"
+
+[[bin]]
+name = "check_wallet"
+path = "check_wallet.rs"

@@ -1,0 +1,383 @@
+{
+	"info": {
+		"_postman_id": "solana-token-backend-v3",
+		"name": "Solana Token Backend API - Complete V3",
+		"description": "Complete Solana Token Backend with KARMM tokens on Mainnet - Updated with Master Balance API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Authentication",
+			"item": [
+				{
+					"name": "Signup - Create User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"token\", jsonData.token);",
+									"    pm.environment.set(\"user_id\", jsonData.user_id);",
+									"    pm.environment.set(\"public_key\", jsonData.public_key);",
+									"    console.log(\"Token saved:\", jsonData.token);",
+									"    console.log(\"User ID:\", jsonData.user_id);",
+									"    console.log(\"Public Key:\", jsonData.public_key);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/signup",
+							"host": ["{{base_url}}"],
+							"path": ["signup"]
+						},
+						"description": "Create new user with automatic Solana wallet"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"token\", jsonData.token);",
+									"    pm.environment.set(\"user_id\", jsonData.user_id);",
+									"    console.log(\"Token saved:\", jsonData.token);",
+									"    console.log(\"User ID:\", jsonData.user_id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": ["{{base_url}}"],
+							"path": ["login"]
+						},
+						"description": "Login and get JWT token"
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"admin_token\", jsonData.token);",
+									"    pm.environment.set(\"admin_user_id\", jsonData.user_id);",
+									"    console.log(\"Admin Token saved:\", jsonData.token);",
+									"    console.log(\"Admin User ID:\", jsonData.user_id);",
+									"    if (jsonData.user_id === 1) {",
+									"        console.log(\"✅ You are ADMIN!\");",
+									"    } else {",
+									"        console.log(\"❌ Not admin - user_id =\", jsonData.user_id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": ["{{base_url}}"],
+							"path": ["login"]
+						},
+						"description": "Login as admin (user_id = 1)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Token Operations",
+			"item": [
+				{
+					"name": "Get Balance",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/balance",
+							"host": ["{{base_url}}"],
+							"path": ["balance"]
+						},
+						"description": "Get token balance from blockchain"
+					},
+					"response": []
+				},
+				{
+					"name": "Transfer to Address",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"to\": \"7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU\",\n  \"tokens\": 5.0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/transfer",
+							"host": ["{{base_url}}"],
+							"path": ["transfer"]
+						},
+						"description": "Transfer tokens from your wallet to any Solana address"
+					},
+					"response": []
+				},
+				{
+					"name": "Buy Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tokens\": 10.0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/buy-token",
+							"host": ["{{base_url}}"],
+							"path": ["buy-token"]
+						},
+						"description": "Buy tokens - master wallet sends tokens to user"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. Admin Operations",
+			"item": [
+				{
+					"name": "Get Master Wallet Balance",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/master-balance",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "master-balance"]
+						},
+						"description": "Admin only: View master wallet SOL and token balance with health status"
+					},
+					"response": []
+				},
+				{
+					"name": "Reward - Send Tokens to User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": 2,\n  \"tokens\": 100.0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/reward",
+							"host": ["{{base_url}}"],
+							"path": ["reward"]
+						},
+						"description": "Admin only: Send tokens from master wallet to registered user (user_id)"
+					},
+					"response": []
+				},
+				{
+					"name": "Send to Any Address",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"to_address\": \"7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU\",\n  \"tokens\": 10.0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/send-to-address",
+							"host": ["{{base_url}}"],
+							"path": ["send-to-address"]
+						},
+						"description": "Admin only: Send tokens from master wallet to ANY Solana address (no registration needed)"
+					},
+					"response": []
+				},
+				{
+					"name": "Deduct Tokens",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": 2,\n  \"amount\": 1000000000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/deduct",
+							"host": ["{{base_url}}"],
+							"path": ["deduct"]
+						},
+						"description": "Deduct tokens from user to master wallet"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Testing Endpoints",
+			"item": [
+				{
+					"name": "Test Transfer to Master",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"from_private_key\": \"your_hex_private_key_here\",\n  \"amount\": 1000000000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/test/transfer-to-master",
+							"host": ["{{base_url}}"],
+							"path": ["test", "transfer-to-master"]
+						},
+						"description": "Testing: Transfer using private key"
+					},
+					"response": []
+				},
+				{
+					"name": "Test Transfer by Address",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"from_address\": \"{{public_key}}\",\n  \"amount\": 1000000000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/test/transfer-to-master-by-address",
+							"host": ["{{base_url}}"],
+							"path": ["test", "transfer-to-master-by-address"]
+						},
+						"description": "Testing: Transfer using registered user's address"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}
