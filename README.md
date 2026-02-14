@@ -114,6 +114,17 @@ You can import this file into Postman to immediately test the following capabili
 
 This collection provides a practical demonstration of how the REST API bridges standard HTTP requests with complex blockchain operations.
 
+## Official Resources
+
+For developers willing to extend this project or learn more about the underlying technologies, we recommend the following official documentation:
+
+*   **Solana Blockchain:** [Solana Documentation](https://solana.com/docs)
+*   **Rust Programming Language:** [The Rust Book](https://doc.rust-lang.org/book/)
+*   **Axum Web Framework:** [Axum Documentation](https://docs.rs/axum/latest/axum/)
+*   **SPL Token Library:** [Solana Program Library (SPL)](https://spl.solana.com/token)
+*   **Docker:** [Docker Documentation](https://docs.docker.com/)
+*   **Helius (RPC Provider):** [Helius Documentation](https://docs.helius.dev/)
+
 ## License
 
 This project is licensed under the MIT License.
