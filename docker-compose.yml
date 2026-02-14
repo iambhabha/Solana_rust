@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./users.db:/app/users.db
+    restart: unless-stopped
+    environment:
+      # These will be overridden by the .env file if present
+      - RUST_LOG=info

@@ -1,352 +1,123 @@
 # Solana Token Backend System
 
-A production-ready custodial wallet system for managing SPL tokens on **Solana MAINNET**, built with Rust and Axum.
+A production-ready custodial wallet system for managing SPL tokens on the Solana Mainnet, built with Rust and Axum.
 
-## ⚠️ IMPORTANT: This is REAL Mainnet!
+## Project Overview
 
-- ✅ **Real Solana Mainnet** - Not devnet or testnet
-- ✅ **Real SPL Tokens** - Actual blockchain transactions
-- ✅ **Viewable in Phantom/Solflare** - Your tokens will appear in real wallet apps
-- ✅ **Production Ready** - Ready for real users and real transactions
+This project provides a complete backend infrastructure for applications that require Solana blockchain integration without burdening users with the complexities of crypto wallet management. It creates a "web2-like" experience where users interact with standard email/password credentials, while the system handles wallet creation, private key security, and blockchain transactions in the background.
 
-## Features
+## Target Audience and Use Cases
 
-- 🔐 **Custodial Wallet System**: Automatically creates Solana wallets for users
-- 🔒 **Secure Encryption**: Private keys encrypted with AES-256-GCM before storage
-- 🎫 **JWT Authentication**: Secure token-based authentication
-- 💰 **SPL Token Management**: Full support for SPL token operations
-- ⛓️ **Solana Mainnet**: Production-ready integration with Solana blockchain
-- 🗄️ **SQLite Database**: Lightweight database for user data
-- 🚀 **RESTful API**: Clean, well-documented API endpoints
+This system is designed for developers and businesses who:
 
-## Project Structure
+*   **Require a Loyalty or Reward System:** Integrate points or tokens into an existing application where the "points" are actual on-chain SPL tokens.
+*   **Need Custodial Wallet Management:** Want to provide users with Solana wallets but prefer to manage the security and custody of keys centrally, similar to how an exchange operates.
+*   **Want to Subsidize Gas Fees:** The system uses a master treasury wallet to pay for all transaction fees, ensuring a seamless user experience where users never need to hold SOL to transact.
+*   **Seek High Performance and Security:** Built with Rust for safety and speed, using industry-standard encryption for sensitive data.
 
-```
-src/
-├── main.rs              # Application entry point
-├── config.rs            # Configuration management
-├── db.rs                # Database operations
-├── auth.rs              # JWT authentication
-├── encryption.rs        # Private key encryption/decryption
-├── wallet.rs            # Wallet creation and management
-├── solana_service.rs    # Solana blockchain operations
-├── routes.rs            # API route handlers
-└── errors.rs            # Error handling
-```
+## Key Features
+
+*   **Custodial Wallet Generation:** Automatically generates a unique Solana wallet for every registered user.
+*   **Bank-Grade Encryption:** User private keys are encrypted using AES-256-GCM before being stored in the database. The keys are only decrypted in memory for the brief moment required to sign a transaction.
+*   **JWT Authentication:** Secure, stateless authentication using JSON Web Tokens.
+*   **Spl Token Support:** Full native support for SPL tokens (e.g., USDC, or custom project tokens).
+*   **Mainnet Ready:** Configured for the Solana Mainnet Beta, ensuring real-world applicability.
+*   **Containerized Deployment:** Includes Docker support for consistent deployment across any environment.
+
+## Technical Architecture
+
+The application is structured as a modular Rust service:
+
+*   `src/main.rs`: Entry point and server initialization.
+*   `src/routes.rs`: API definitions and HTTP request handlers.
+*   `src/solana_service.rs`: Core logic for interacting with the Solana blockchain.
+*   `src/encryption.rs`: Security module for handling key encryption and decryption.
+*   `src/db.rs`: Database interaction layer using SQLite.
 
 ## Prerequisites
 
-- Rust 1.70+ installed ([rustup.rs](https://rustup.rs/))
-- Solana CLI tools (optional, for key generation)
-- Helius or Alchemy RPC API key for Solana mainnet
-- Your KARMM token mint address on Solana mainnet
+To run this system, you will need:
 
-## Setup Instructions
+1.  **Docker Desktop** (Recommended for deployment).
+2.  **Solana RPC URL:** An endpoint from a provider like Helius or Alchemy for connecting to the Solana Mainnet.
+3.  **SPL Token Mint Address:** The address of the token you wish to distribute or manage.
+4.  **Master Wallet:** A funded Solana wallet to act as the treasury and fee payer.
 
-### 1. Clone and Navigate
+## Quick Start with Docker
 
-```bash
-cd Solana_rust
-```
+The most efficient way to run the application is via Docker.
 
-### 2. Install Dependencies
+1.  **Clone the repository**
+    
+    Clone the codebase to your local machine.
 
-```bash
-cargo build
-```
+2.  **Configuration**
 
-### 3. Configure Environment Variables
+    Create a `.env` file in the root directory. You can copy the provided example:
+    
+    `cp .env.example .env`
+    
+    Open the `.env` file and strictly follow the comments to populate your secrets (RPC URL, specific keys, etc.).
 
-Copy the example environment file:
+3.  **Launch the Service**
 
-```bash
-cp .env.example .env
-```
+    Run the following command to build and start the container:
 
-Edit `.env` and fill in all required values:
+    `docker-compose up -d`
 
-```env
-# Generate encryption key (32 bytes hex)
-openssl rand -hex 32
+    The initial build process may take a few minutes as it compiles the Rust dependencies. Once complete, the API will be accessible at `http://localhost:3000`.
 
-# Generate JWT secret (use a strong random string)
-openssl rand -base64 32
+## Manual Installation (Rust Native)
 
-# Set your Solana RPC URL (Helius or Alchemy)
-SOLANA_RPC_URL=https://mainnet.helius-rpc.com/?api-key=YOUR_API_KEY
+If you prefer to run the application without Docker:
 
-# Set your KARMM token mint address
-KARMM_MINT_ADDRESS=YourKarmmMintAddressHere
+1.  Ensure **Rust** (version 1.70 or later) is installed on your system.
+2.  Navigate to the project directory.
+3.  Configure the `.env` file as described above.
+4.  Execute the run command:
 
-# Generate master wallet private key
-solana-keygen new --outfile master-wallet.json --no-bip39-passphrase
-# Convert to hex (you'll need to extract the secret key array)
-```
+    `cargo run`
 
-**Important Security Notes:**
-- Never commit `.env` file to version control
-- Use strong, random values for `JWT_SECRET` and `ENCRYPTION_KEY`
-- Keep `MASTER_WALLET_PRIVATE_KEY` secure - it controls your treasury wallet
-- Use a private RPC endpoint (Helius/Alchemy) for production
+## Security Recommendations
 
-### 4. Generate Master Wallet (if needed)
-
-If you need to create a new master wallet:
+This system was built with security in mind, but for a production environment, you should observe the following practices:
 
-```bash
-solana-keygen new --outfile master-wallet.json --no-bip39-passphrase
-```
+*   **Environment Variables:** Never commit your `.env` file to version control.
+*   **Secret Management:** For high-value deployments, consider using a dedicated secret management service (like AWS Secrets Manager or Vault) instead of a simple `.env` file.
+*   **HTTPS:** Always run this service behind a reverse proxy (like Nginx) with SSL/TLS enabled.
+*   **Key Rotation:** Regularly rotate your JWT secrets and database encryption keys.
 
-Extract the private key bytes and convert to hex format for the `.env` file.
-
-### 5. Run the Server
-
-```bash
-cargo run
-```
-
-The server will start on `http://localhost:3000` (or your configured `SERVER_PORT`).
-
-## API Endpoints
-
-### Public Endpoints
-
-#### POST `/signup`
-Create a new user account and Solana wallet.
-
-**Request:**
-```json
-{
-  "email": "user@example.com",
-  "password": "securepassword123"
-}
-```
-
-**Response:**
-```json
-{
-  "message": "User created successfully",
-  "user_id": 1,
-  "public_key": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
-
-#### POST `/login`
-Authenticate user and get JWT token.
-
-**Request:**
-```json
-{
-  "email": "user@example.com",
-  "password": "securepassword123"
-}
-```
-
-**Response:**
-```json
-{
-  "message": "Login successful",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user_id": 1
-}
-```
-
-### Protected Endpoints (Require JWT Token)
-
-All protected endpoints require the `Authorization: Bearer <token>` header.
-
-#### GET `/balance`
-Get user's KARMM token balance from Solana blockchain.
-
-**Headers:**
-```
-Authorization: Bearer <jwt_token>
-```
-
-**Response:**
-```json
-{
-  "balance": 1000000000,
-  "public_key": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU"
-}
-```
-
-#### POST `/buy-token`
-Transfer tokens from master wallet to user (after payment confirmation).
-
-**Request:**
-```json
-{
-  "amount": 1000000000,
-  "payment_id": "payment_12345"
-}
-```
-
-**Response:**
-```json
-{
-  "message": "Tokens purchased successfully",
-  "transaction_signature": "5VERv8NMvzbJMEkV8xkRDZ18YVp53vVvAuoKvfONSWv5uGUQYFpYMDyRviWNjyw5VFxOGewYJby",
-  "amount": 1000000000
-}
-```
-
-#### POST `/transfer`
-Transfer tokens between users.
-
-**Request:**
-```json
-{
-  "to": "RecipientPublicKeyHere",
-  "amount": 500000000
-}
-```
-
-**Response:**
-```json
-{
-  "message": "Transfer successful",
-  "transaction_signature": "5VERv8NMvzbJMEkV8xkRDZ18YVp53vVvAuoKvfONSWv5uGUQYFpYMDyRviWNjyw5VFxOGewYJby",
-  "amount": 500000000
-}
-```
-
-#### POST `/deduct`
-Deduct tokens from user back to master wallet.
-
-**Request:**
-```json
-{
-  "amount": 100000000,
-  "user_id": 1  // Optional, defaults to current user
-}
-```
-
-**Response:**
-```json
-{
-  "message": "Tokens deducted successfully",
-  "transaction_signature": "5VERv8NMvzbJMEkV8xkRDZ18YVp53vVvAuoKvfONSWv5uGUQYFpYMDyRviWNjyw5VFxOGewYJby",
-  "amount": 100000000
-}
-```
-
-#### POST `/reward`
-Send tokens from master wallet to user as reward.
-
-**Request:**
-```json
-{
-  "user_id": 1,
-  "amount": 2000000000
-}
-```
-
-**Response:**
-```json
-{
-  "message": "Reward sent successfully",
-  "transaction_signature": "5VERv8NMvzbJMEkV8xkRDZ18YVp53vVvAuoKvfONSWv5uGUQYFpYMDyRviWNjyw5VFxOGewYJby",
-  "amount": 2000000000
-}
-```
-
-## Example Usage
-
-See `examples/curl_requests.sh` for complete cURL examples.
-
-Quick test:
-
-```bash
-# Signup
-curl -X POST http://localhost:3000/signup \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"password123"}'
-
-# Login (save the token)
-TOKEN=$(curl -s -X POST http://localhost:3000/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"password123"}' | jq -r '.token')
-
-# Get balance
-curl -X GET http://localhost:3000/balance \
-  -H "Authorization: Bearer $TOKEN"
-```
-
-## Security Considerations
-
-1. **Private Key Encryption**: All private keys are encrypted with AES-256-GCM before storage
-2. **Password Hashing**: Passwords are hashed using bcrypt
-3. **JWT Tokens**: Secure token-based authentication with expiration
-4. **Environment Variables**: Sensitive data stored in `.env` (never commit)
-5. **Rate Limiting**: Consider adding rate limiting middleware for production
-6. **HTTPS**: Always use HTTPS in production
-7. **Master Wallet Security**: Keep master wallet private key extremely secure
-
-## Token Amounts
-
-SPL tokens typically use 9 decimals. When sending amounts:
-- `1000000000` = 1.0 token (with 9 decimals)
-- `100000000` = 0.1 token
-- `1` = 0.000000001 token
-
-Adjust the `decimals` value in `solana_service.rs` if your token uses different decimals.
-
-## Database Schema
-
-The system creates two tables:
-
-- **users**: Stores user accounts, encrypted private keys, and public keys
-- **master_wallet**: Stores master wallet information (optional, currently uses env var)
-
-## Error Handling
-
-All endpoints return consistent error responses:
-
-```json
-{
-  "error": "Error message here",
-  "status": 400
-}
-```
-
-Common status codes:
-- `200`: Success
-- `400`: Bad Request (validation errors)
-- `401`: Unauthorized (authentication required)
-- `500`: Internal Server Error
-
-## Production Deployment
-
-1. **Environment**: Set all environment variables securely
-2. **Database**: Consider migrating to PostgreSQL for production
-3. **Rate Limiting**: Add rate limiting middleware
-4. **Logging**: Add structured logging (e.g., `tracing`)
-5. **Monitoring**: Add health check endpoints
-6. **Backup**: Regular database backups
-7. **SSL/TLS**: Use HTTPS with valid certificates
-8. **Master Wallet**: Use hardware wallet or secure key management service
-
-## Troubleshooting
-
-### "Failed to create token account"
-- Ensure master wallet has enough SOL for transaction fees
-- Check RPC endpoint is accessible
-- Verify mint address is correct
-
-### "Insufficient balance"
-- Check user's token balance on Solana explorer
-- Ensure associated token account exists
-
-### "Invalid public key"
-- Verify Solana public key format (base58 encoded)
-- Check key length (should be 32 bytes)
+## API Documentation
+
+The API exposes the following primary endpoints. All protected routes require a valid Bearer token in the Release header.
+
+### Public Routes
+
+*   `POST /signup`: Register a new user and generate their wallet.
+*   `POST /login`: Authenticate an existing user and receive a JWT.
+
+### Protected Routes
+
+*   `GET /balance`: Retrieve the SOL and Token balance of the authenticated user.
+*   `POST /transfer`: Send tokens from the user's wallet to another address.
+*   `POST /buy-token`: Simulates a purchase where the master wallet sends tokens to the user.
+*   `POST /reward`: Admin endpoint to airdrop tokens to a specific user.
+
+## API Testing and Verification
+
+To facilitate easy testing and integration, we have included a **Postman Collection** in the repository: `Solana_Token_Backend_UPDATED.postman_collection.json`.
+
+You can import this file into Postman to immediately test the following capabilities:
+*   **Debiting Tokens:** Deducting SPL tokens from a user's wallet.
+*   **Crediting Tokens:** Distributing SPL tokens to a user as a reward or transfer.
+*   **Balance Checks:** Real-time verification of on-chain balances.
+
+This collection provides a practical demonstration of how the REST API bridges standard HTTP requests with complex blockchain operations.
 
 ## License
 
-MIT License - See LICENSE file for details
+This project is licensed under the MIT License.
 
-## Support
+## Support and Contact
 
-For issues and questions, please open an issue on GitHub.
+For further information, architectural details, or specific implementation questions, please feel free to reach out to the project maintainer directly. We are happy to assist with integration queries.
