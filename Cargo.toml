@@ -32,9 +32,13 @@ hex = "0.4"
 # Environment variables
 dotenv = "0.15"
 
-# Rate limiting
+# Rate limiting and CORS
 tower = "0.4"
-tower-http = { version = "0.5", features = ["limit"] }
+tower-http = { version = "0.5", features = ["limit", "cors", "trace"] }
+
+# Structured Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 # Error handling
 anyhow = "1.0"

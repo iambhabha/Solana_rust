@@ -10,6 +10,8 @@ mod wallet;
 use routes::create_router;
 use std::net::SocketAddr;
 use std::sync::Arc;
+use serde_json::json;
+use axum::{routing::get, Json, Router};
 
 #[tokio::main]
 async fn main() {
@@ -36,17 +38,27 @@ async fn main() {
     };
 
     // Create router with all routes
-    let app = create_router(app_state);
+    let app = create_router(app_state).route("/health", get(health_check));
+
+    // Initialize tracing
+    tracing_subscriber::fmt()
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+        .init();
 
     // Start server
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
-    println!("🚀 Solana Token Backend Server running at http://{}", addr);
+    tracing::info!("🚀 Solana Token Backend Server running at http://{}", addr);
     println!("📝 Make sure to set all required environment variables in .env file");
+    
+    // Add CORS and Tracing middleware
+    let app = app
+        .layer(tower_http::trace::TraceLayer::new_for_http())
+        .layer(tower_http::cors::CorsLayer::permissive());
 
-    axum::serve(
-        tokio::net::TcpListener::bind(addr).await.unwrap(),
-        app.into_make_service(),
-    )
-    .await
-    .unwrap();
+    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+
+/// GET /health - Health check endpoint
+async fn health_check() -> Json<serde_json::Value> {
+    Json(json!({ "status": "ok" }))
 }
+

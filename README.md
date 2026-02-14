@@ -43,21 +43,35 @@ To run this system, you will need:
 3.  **SPL Token Mint Address:** The address of the token you wish to distribute or manage.
 4.  **Master Wallet:** A funded Solana wallet to act as the treasury and fee payer.
 
-## Quick Start with Docker
+## Quick Start (Automated Setup)
 
-The most efficient way to run the application is via Docker.
+We have included automated setup scripts to make configuration effortless. These scripts will ask you for your Solana details and automatically generate secure keys for you.
 
 1.  **Clone the repository**
     
     Clone the codebase to your local machine.
 
-2.  **Configuration**
+2.  **Run Setup Script**
 
-    Create a `.env` file in the root directory. You can copy the provided example:
-    
-    `cp .env.example .env`
-    
-    Open the `.env` file and strictly follow the comments to populate your secrets (RPC URL, specific keys, etc.).
+    **For Windows:**
+    Double-click `setup.bat` or run via terminal:
+    ```cmd
+    .\setup.bat
+    ```
+
+    **For Mac/Linux:**
+    Run the shell script:
+    ```bash
+    chmod +x setup.sh
+    ./setup.sh
+    ```
+
+    The script will prompt you for:
+    *   RPC URL
+    *   Mint Address
+    *   Master Wallet Private Key
+
+    It will then automatically generate your `.env` file with a secure JWT Secret and Encryption Key.
 
 3.  **Launch the Service**
 
